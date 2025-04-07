@@ -1,0 +1,10 @@
+.dish-list {
+  padding: 16px;
+  background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+  .dish-list {
+    padding: 12px 8px;
+  }
+}

@@ -1,0 +1,138 @@
+.dish-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  position: relative;
+  background-color: #fff;
+}
+
+.dish-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  font-size: 10px;
+}
+
+.icon.green {
+  color: green;
+}
+
+.icon.red {
+  color: red;
+}
+
+
+
+.dish-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0;
+}
+
+.dish-price {
+  font-weight: 600;
+  margin: 4px 0;
+}
+
+.dish-desc {
+  font-size: 14px;
+  color: #555;
+  margin: 4px 0 8px 0;
+}
+
+.dish-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.dish-counter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background-color: #2ecc71;
+  border-radius: 20px;
+  padding: 4px 12px;
+  color: white;
+  font-weight: 600;
+}
+
+.dish-dis {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1000px;
+}
+
+.dish-counter button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.dish-calories {
+  color: orange;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.customization {
+  color: #6c63ff;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.not-available {
+  color: red;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.dish-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .dish-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dish-image {
+    position: static;
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+  }
+
+  .dish-actions {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .dish-calories {
+    text-align: right;
+    flex-shrink: 0;
+  }
+}
