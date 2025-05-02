@@ -1,46 +1,52 @@
 import React from 'react'
 import './index.css'
-import {FaCircle, FaPlus, FaMinus} from 'react-icons/fa'
+import {FaCircle} from 'react-icons/fa'
 
-const Dishcard = ({dish, count, onCountChange}) => {
+const Dishcard = ({dish, count, onCountChang}) => {
   const {
-    dish_name,
-    dish_price,
-    dish_description,
-    dish_image,
-    dish_calories,
-    dish_Availability,
-    dish_Type,
+    dish_name: dishName,
+    dish_price: dishPrice,
+    dish_description: dishDescription,
+    dish_image: dishImage,
+    dish_calories: dishCalories,
+    dish_Availability: dishAvailability,
+    dish_Type: dishType,
+    dish_currency: dishCurrency,
     addonCat,
   } = dish
 
   return (
     <div className="dish-card">
       <div className="dish-header">
-        <FaCircle className={dish_Type === 2 ? 'icon green' : 'icon red'}  />
-        <h3 className="dish-title">{dish_name}</h3>
+        <FaCircle className={dishType === 2 ? 'icon green' : 'icon red'} />
+        <h1 className="dish-title">{dishName}</h1>
       </div>
-      <p className="dish-price">SAR {dish_price}</p>
+      <p className="dish-price">
+        {dishCurrency} {dishPrice}
+      </p>
       <div className="dish-dis">
-        <p className="dish-desc">{dish_description}</p>
-        <p className="dish-calories">{dish_calories} calories</p>
+        <p className="dish-desc">{dishDescription}</p>
+        <p className="dish-calories">{dishCalories} calories</p>
       </div>
-      <div className="dish-actions">
-        <div className="dish-counter">
-          <button type="button" onClick={() => onCountChange('decrement')}>
-            <FaMinus />
-          </button>
-          <span>{count}</span>
-          <button type="button" onClick={() => onCountChange('increment')}>
-            <FaPlus />
-          </button>
+      {dishAvailability && (
+        <div className="dish-actions">
+          <div className="dish-counter">
+            <button type="button" onClick={() => onCountChang('decrement')}>
+              -
+            </button>
+            <p>{count || '0'}</p>
+            <button type="button" onClick={() => onCountChang('increment')}>
+              +
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
       {addonCat?.length > 0 && (
         <p className="customization">Customizations available</p>
       )}
-      {!dish_Availability && <p className="not-available">Not available</p>}
-      <img src={dish_image} alt={dish_name} className="dish-image" />
+      {!dishAvailability && <p className="not-available">Not available</p>}
+      <img src={dishImage} alt={dishName} className="dish-image" />
     </div>
   )
 }

@@ -1,16 +1,24 @@
-// App.js
 import React, {Component} from 'react'
 import Header from './components/Header'
 import Tabs from './components/Tabs'
 import Dishlist from './components/Dishlist'
 import './App.css'
 
+const apiStatusConstants = {
+  initial: 'INITIAL',
+  inProgress: 'IN_PROGRESS',
+  success: 'SUCCESS',
+  failure: 'FAILURE',
+}
+
 class App extends Component {
   state = {
     menuData: [],
     activeCategoryId: '',
+    restaurant: {},
     cartCount: 0,
     dishCounts: {},
+    apiStatus: apiStatusConstants.initial,
   }
 
   componentDidMount() {
@@ -18,15 +26,36 @@ class App extends Component {
   }
 
   getMenuData = async () => {
+    this.setState({apiStatus: apiStatusConstants.inProgress})
+
     const response = await fetch(
       'https://apis2.ccbp.in/restaurant-app/restaurant-menu-list-details',
     )
-    const data = await response.json()
-    const categories = data[0]?.table_menu_list || []
-    this.setState({
-      menuData: categories,
-      activeCategoryId: categories[0]?.menu_category_id || '',
-    })
+
+    if (response.ok) {
+      const data = await response.json()
+      const restaurantInfo = {
+        restaurant_name: data[0]?.restaurant_name,
+      }
+      const categories = data[0]?.table_menu_list || []
+
+      const dishCounts = categories.reduce((acc, category) => {
+        category.category_dishes.forEach(dish => {
+          acc[dish.dish_id] = 0
+        })
+        return acc
+      }, {})
+
+      this.setState({
+        menuData: categories,
+        restaurant: restaurantInfo,
+        activeCategoryId: categories[0]?.menu_category_id || '',
+        dishCounts,
+        apiStatus: apiStatusConstants.success,
+      })
+    } else {
+      this.setState({apiStatus: apiStatusConstants.failure})
+    }
   }
 
   setActiveCategory = id => {
@@ -34,10 +63,25 @@ class App extends Component {
   }
 
   updateDishCount = (dishId, operation) => {
+    const {menuData} = this.state
+    const activeDish = menuData
+      .flatMap(category => category.category_dishes)
+      .find(dish => dish.dish_id === dishId)
+
+    if (!activeDish || !activeDish.dish_Availability) {
+      return
+    }
+
     this.setState(prevState => {
       const prevCount = prevState.dishCounts[dishId] || 0
-      const newCount =
-        operation === 'increment' ? prevCount + 1 : Math.max(prevCount - 1, 0)
+      let newCount = prevCount
+
+      if (operation === 'increment') {
+        newCount += 1
+      } else if (operation === 'decrement' && prevCount > 0) {
+        newCount -= 1
+      }
+
       const newDishCounts = {...prevState.dishCounts, [dishId]: newCount}
       const newCartCount = Object.values(newDishCounts).reduce(
         (a, b) => a + b,
@@ -51,15 +95,21 @@ class App extends Component {
     })
   }
 
-  render() {
-    const {menuData, activeCategoryId, cartCount, dishCounts} = this.state
+  renderSuccessView = () => {
+    const {
+      menuData,
+      activeCategoryId,
+      dishCounts,
+      restaurant,
+      cartCount,
+    } = this.state
     const activeCategory = menuData.find(
       category => category.menu_category_id === activeCategoryId,
     )
 
     return (
-      <div className="app">
-        <Header cartCount={cartCount} />
+      <>
+        <Header cartCount={cartCount} restaurant={restaurant} />
         <Tabs
           menuData={menuData}
           activeCategoryId={activeCategoryId}
@@ -72,8 +122,39 @@ class App extends Component {
             updateDishCount={this.updateDishCount}
           />
         )}
-      </div>
+      </>
     )
+  }
+
+  renderFailureView = () => (
+    <div className="error-view">
+      <p>Failed to load menu. Please try again.</p>
+    </div>
+  )
+
+  renderLoader = () => (
+    <div className="loader-view" data-testid="loader">
+      <p>Loading...</p>
+    </div>
+  )
+
+  renderAppView = () => {
+    const {apiStatus} = this.state
+
+    switch (apiStatus) {
+      case apiStatusConstants.success:
+        return this.renderSuccessView()
+      case apiStatusConstants.failure:
+        return this.renderFailureView()
+      case apiStatusConstants.inProgress:
+        return this.renderLoader()
+      default:
+        return null
+    }
+  }
+
+  render() {
+    return <div className="app">{this.renderAppView()}</div>
   }
 }
 
