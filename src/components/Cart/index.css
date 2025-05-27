@@ -1,0 +1,150 @@
+/* index.css */
+
+/* Overall Cart Container */
+.cart-container {
+  padding: 30px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #f9fafc;
+  min-height: 100vh;
+}
+
+.cart-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* Empty Cart State */
+.empty-cart-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.empty-cart-img {
+  width: 250px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.empty-cart-msg {
+  font-size: 24px;
+  color: #64748b;
+}
+
+/* Cart Items List */
+.cart-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  padding: 15px;
+  flex-wrap: wrap;
+}
+
+.cart-item-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 20px;
+}
+
+.cart-item-details {
+  flex: 1;
+  min-width: 200px;
+}
+
+.cart-item-name {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  color: #0f172a;
+}
+
+.cart-item-price {
+  font-size: 18px;
+  color: #10b981;
+  margin: 4px 0 12px 0;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qty-btn {
+  background-color: #e2e8f0;
+  border: none;
+  color: #1e293b;
+  padding: 6px 12px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.qty-btn:hover {
+  background-color: #cbd5e1;
+}
+
+.quantity {
+  font-size: 16px;
+  font-weight: 500;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Remove Buttons */
+.remove-btn,
+.clear-cart-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 10px;
+}
+
+.remove-btn:hover,
+.clear-cart-btn:hover {
+  background-color: #dc2626;
+}
+
+.clear-cart-btn {
+  display: block;
+  margin: 20px auto;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cart-item-image {
+    width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+  }
+
+  .remove-btn {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}

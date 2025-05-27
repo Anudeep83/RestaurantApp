@@ -1,160 +1,87 @@
 import React, {Component} from 'react'
-import Header from './components/Header'
-import Tabs from './components/Tabs'
-import Dishlist from './components/Dishlist'
-import './App.css'
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 
-const apiStatusConstants = {
-  initial: 'INITIAL',
-  inProgress: 'IN_PROGRESS',
-  success: 'SUCCESS',
-  failure: 'FAILURE',
-}
+import Header from './components/Header'
+import Home from './components/Home'
+import Cart from './components/Cart'
+import Login from './components/Login'
+import CartContext from './context/CartContext'
+import './App.css'
 
 class App extends Component {
   state = {
-    menuData: [],
-    activeCategoryId: '',
-    restaurant: {},
-    cartCount: 0,
-    dishCounts: {},
-    apiStatus: apiStatusConstants.initial,
+    cartList: [],
   }
 
-  componentDidMount() {
-    this.getMenuData()
-  }
-
-  getMenuData = async () => {
-    this.setState({apiStatus: apiStatusConstants.inProgress})
-
-    const response = await fetch(
-      'https://apis2.ccbp.in/restaurant-app/restaurant-menu-list-details',
-    )
-
-    if (response.ok) {
-      const data = await response.json()
-      const restaurantInfo = {
-        restaurant_name: data[0]?.restaurant_name,
-      }
-      const categories = data[0]?.table_menu_list || []
-
-      const dishCounts = categories.reduce((acc, category) => {
-        category.category_dishes.forEach(dish => {
-          acc[dish.dish_id] = 0
-        })
-        return acc
-      }, {})
-
-      this.setState({
-        menuData: categories,
-        restaurant: restaurantInfo,
-        activeCategoryId: categories[0]?.menu_category_id || '',
-        dishCounts,
-        apiStatus: apiStatusConstants.success,
-      })
-    } else {
-      this.setState({apiStatus: apiStatusConstants.failure})
-    }
-  }
-
-  setActiveCategory = id => {
-    this.setState({activeCategoryId: id})
-  }
-
-  updateDishCount = (dishId, operation) => {
-    const {menuData} = this.state
-    const activeDish = menuData
-      .flatMap(category => category.category_dishes)
-      .find(dish => dish.dish_id === dishId)
-
-    if (!activeDish || !activeDish.dish_Availability) {
-      return
-    }
-
+  addCartItem = dish => {
     this.setState(prevState => {
-      const prevCount = prevState.dishCounts[dishId] || 0
-      let newCount = prevCount
-
-      if (operation === 'increment') {
-        newCount += 1
-      } else if (operation === 'decrement' && prevCount > 0) {
-        newCount -= 1
-      }
-
-      const newDishCounts = {...prevState.dishCounts, [dishId]: newCount}
-      const newCartCount = Object.values(newDishCounts).reduce(
-        (a, b) => a + b,
-        0,
+      const dishIndex = prevState.cartList.findIndex(
+        item => item.dish_id === dish.dish_id,
       )
 
-      return {
-        dishCounts: newDishCounts,
-        cartCount: newCartCount,
+      if (dishIndex !== -1) {
+        const updatedCartList = [...prevState.cartList]
+        updatedCartList[dishIndex].quantity += 1
+        return {cartList: updatedCartList}
+      } else {
+        return {cartList: [...prevState.cartList, {...dish, quantity: 1}]}
       }
     })
   }
 
-  renderSuccessView = () => {
-    const {
-      menuData,
-      activeCategoryId,
-      dishCounts,
-      restaurant,
-      cartCount,
-    } = this.state
-    const activeCategory = menuData.find(
-      category => category.menu_category_id === activeCategoryId,
-    )
-
-    return (
-      <>
-        <Header cartCount={cartCount} restaurant={restaurant} />
-        <Tabs
-          menuData={menuData}
-          activeCategoryId={activeCategoryId}
-          setActiveCategory={this.setActiveCategory}
-        />
-        {activeCategory && (
-          <Dishlist
-            items={activeCategory.category_dishes}
-            dishCounts={dishCounts}
-            updateDishCount={this.updateDishCount}
-          />
-        )}
-      </>
-    )
+  removeCartItem = id => {
+    this.setState(prevState => ({
+      cartList: prevState.cartList.filter(item => item.dish_id !== id),
+    }))
   }
 
-  renderFailureView = () => (
-    <div className="error-view">
-      <p>Failed to load menu. Please try again.</p>
-    </div>
-  )
+  incrementCartItemQuantity = id => {
+    this.setState(prevState => ({
+      cartList: prevState.cartList.map(item =>
+        item.dish_id === id ? {...item, quantity: item.quantity + 1} : item,
+      ),
+    }))
+  }
 
-  renderLoader = () => (
-    <div className="loader-view" data-testid="loader">
-      <p>Loading...</p>
-    </div>
-  )
+  decrementCartItemQuantity = id => {
+    this.setState(prevState => {
+      const updatedList = prevState.cartList
+        .map(item =>
+          item.dish_id === id ? {...item, quantity: item.quantity - 1} : item,
+        )
+        .filter(item => item.quantity > 0)
 
-  renderAppView = () => {
-    const {apiStatus} = this.state
+      return {cartList: updatedList}
+    })
+  }
 
-    switch (apiStatus) {
-      case apiStatusConstants.success:
-        return this.renderSuccessView()
-      case apiStatusConstants.failure:
-        return this.renderFailureView()
-      case apiStatusConstants.inProgress:
-        return this.renderLoader()
-      default:
-        return null
-    }
+  removeAllCartItems = () => {
+    this.setState({cartList: []})
   }
 
   render() {
-    return <div className="app">{this.renderAppView()}</div>
+    const {cartList} = this.state
+
+    return (
+      <CartContext.Provider
+        value={{
+          cartList,
+          addCartItem: this.addCartItem,
+          removeCartItem: this.removeCartItem,
+          incrementCartItemQuantity: this.incrementCartItemQuantity,
+          decrementCartItemQuantity: this.decrementCartItemQuantity,
+          removeAllCartItems: this.removeAllCartItems,
+        }}
+      >
+        <Router>
+          <Switch>
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/" component={Home} />
+            <Route exact path="/cart" component={Cart} />
+          </Switch>
+        </Router>
+      </CartContext.Provider>
+    )
   }
 }
 

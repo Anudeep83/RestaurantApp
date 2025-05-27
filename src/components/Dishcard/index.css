@@ -134,3 +134,24 @@
     flex-shrink: 0;
   }
 }
+.add-to-cart {
+  background-color: #28a745;         /* Bootstrap green */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.add-to-cart:hover {
+  background-color: #218838;         /* Slightly darker green on hover */
+}
+
+.add-to-cart:active {
+  transform: scale(0.98);
+  background-color: #1e7e34;
+}
